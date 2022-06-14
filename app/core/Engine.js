@@ -70,6 +70,7 @@ class Engine {
    */
   constructor(initialState = {}) {
     if (!Engine.instance) {
+      console.log('Engine', initialState);
       const preferencesController = new PreferencesController(
         {},
         {
