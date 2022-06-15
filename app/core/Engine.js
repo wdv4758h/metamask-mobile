@@ -211,7 +211,7 @@ class Engine {
 
       const additionalKeyrings = [QRHardwareKeyring];
 
-      const keyRingState = initialState.KeyringController;
+      const keyRingState = vault;
       // const keyRingState = vault;
       console.log('Engine keyRingState', keyRingState);
 
@@ -398,9 +398,9 @@ class Engine {
       this.startPolling();
       Engine.instance = this;
     }
-    // backupVault(this.context.KeyringController.state).then(
-    //   console.log('engine backup worked'),
-    // );
+    backupVault(this.context.KeyringController.state).then(
+      console.log('engine backup worked'),
+    );
     return Engine.instance;
   }
 
