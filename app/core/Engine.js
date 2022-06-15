@@ -211,32 +211,39 @@ class Engine {
 
       const additionalKeyrings = [QRHardwareKeyring];
 
-      // const keyRingState = initialState.KeyringController;
-      const keyRingState = vault;
+      const keyRingState = initialState.KeyringController;
+      // const keyRingState = vault;
       console.log('Engine keyRingState', keyRingState);
 
+      const newKeyRingController = new KeyringController(
+        {
+          removeIdentity: preferencesController.removeIdentity.bind(
+            preferencesController,
+          ),
+          syncIdentities: preferencesController.syncIdentities.bind(
+            preferencesController,
+          ),
+          updateIdentities: preferencesController.updateIdentities.bind(
+            preferencesController,
+          ),
+          setSelectedAddress: preferencesController.setSelectedAddress.bind(
+            preferencesController,
+          ),
+          setAccountLabel: preferencesController.setAccountLabel.bind(
+            preferencesController,
+          ),
+        },
+        { encryptor, keyringTypes: additionalKeyrings },
+        keyRingState,
+      );
+
+      console.log(
+        'Engine newKeyRingController after init',
+        newKeyRingController,
+      );
+
       const controllers = [
-        new KeyringController(
-          {
-            removeIdentity: preferencesController.removeIdentity.bind(
-              preferencesController,
-            ),
-            syncIdentities: preferencesController.syncIdentities.bind(
-              preferencesController,
-            ),
-            updateIdentities: preferencesController.updateIdentities.bind(
-              preferencesController,
-            ),
-            setSelectedAddress: preferencesController.setSelectedAddress.bind(
-              preferencesController,
-            ),
-            setAccountLabel: preferencesController.setAccountLabel.bind(
-              preferencesController,
-            ),
-          },
-          { encryptor, keyringTypes: additionalKeyrings },
-          initialState.KeyringController,
-        ),
+        newKeyRingController,
         new AccountTrackerController({
           onPreferencesStateChange: (listener) =>
             preferencesController.subscribe(listener),
@@ -827,7 +834,8 @@ export default {
   refreshTransactionHistory(forceCheck = false) {
     return instance.refreshTransactionHistory(forceCheck);
   },
-  init(state: {} | undefined, vault) {
+  init(state: {} | undefined, vault = null) {
+    console.log('Engine init', state, vault);
     instance = new Engine(state, vault);
     Object.freeze(instance);
     return instance;
