@@ -70,7 +70,7 @@ class Engine {
    */
   constructor(initialState = {}, vault) {
     if (!Engine.instance) {
-      console.log('Engine KeyringController', initialState.KeyringController);
+      // console.log('Engine KeyringController', initialState.KeyringController);
       console.log('Engine vault', vault);
       const preferencesController = new PreferencesController(
         {},
@@ -211,7 +211,7 @@ class Engine {
 
       const additionalKeyrings = [QRHardwareKeyring];
 
-      const keyRingState = vault;
+      const keyRingState = vault || initialState.KeyringController;
       // const keyRingState = vault;
       console.log('Engine keyRingState', keyRingState);
 
@@ -237,10 +237,10 @@ class Engine {
         keyRingState,
       );
 
-      console.log(
-        'Engine newKeyRingController after init',
-        newKeyRingController,
-      );
+      // console.log(
+      //   'Engine newKeyRingController after init',
+      //   newKeyRingController,
+      // );
 
       const controllers = [
         newKeyRingController,
@@ -398,10 +398,22 @@ class Engine {
       this.startPolling();
       Engine.instance = this;
     }
-    backupVault(this.context.KeyringController.state).then(
-      console.log('engine backup worked'),
-    );
+
+    this.handleVaultBackup();
+
     return Engine.instance;
+  }
+
+  handleVaultBackup() {
+    const keyringState = this.context.KeyringController.state;
+    console.log('Engine handleVaultBackup keyringState', keyringState.vault);
+    backupVault(keyringState).then((result) => {
+      if (result.success) {
+        console.log('Engine', 'Vault was backed up', result.vault);
+      } else {
+        console.log('Engine', 'Vault backup failed');
+      }
+    });
   }
 
   startPolling() {
@@ -835,7 +847,7 @@ export default {
     return instance.refreshTransactionHistory(forceCheck);
   },
   init(state: {} | undefined, vault = null) {
-    console.log('Engine init', state, vault);
+    // console.log('Engine init', state, vault);
     instance = new Engine(state, vault);
     Object.freeze(instance);
     return instance;
