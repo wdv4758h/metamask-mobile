@@ -211,8 +211,8 @@ class Engine {
 
       const additionalKeyrings = [QRHardwareKeyring];
 
-      const keyRingState = vault || initialState.KeyringController;
-      // const keyRingState = vault;
+      // const keyRingState = vault || initialState.KeyringController;
+      const keyRingState = vault;
       console.log('Engine keyRingState', keyRingState);
 
       const newKeyRingController = new KeyringController(
@@ -236,13 +236,6 @@ class Engine {
         { encryptor, keyringTypes: additionalKeyrings },
         keyRingState,
       );
-
-      // console.log(
-      //   'Engine newKeyRingController after init',
-      //   newKeyRingController,
-      // );
-
-      this.handleVaultBackup(newKeyRingController.internalState);
 
       const controllers = [
         newKeyRingController,
@@ -364,6 +357,7 @@ class Engine {
           controller.update(initialState[controller.name]);
         }
       }
+
       this.datamodel = new ComposableController(
         controllers,
         this.controllerMessenger,
@@ -399,31 +393,24 @@ class Engine {
       );
       this.configureControllersOnNetworkChange();
       this.startPolling();
+      this.handleVaultBackup();
       Engine.instance = this;
     }
 
     return Engine.instance;
   }
 
-  handleVaultBackup(vault) {
-    // console.log(
-    //   'Engine handleVaultBackup context',
-    //   this.context.KeyringController,
-    // );
-    // console.log('Engine handleVaultBackup this', this.KeyringController);
-    // // console.log(
-    // //   'Engine handleVaultBackup this.controllers',
-    // //   this.controllers.KeyringController,
-    // // );
-    // // const keyringState = this.context.KeyringController.vault;
-    // console.log('Engine handleVaultBackup keyringState', this.context.KeyringController.internalState);
-    backupVault(vault).then((result) => {
-      if (result.success) {
-        console.log('Engine', 'Vault was backed up', result.vault);
-      } else {
-        console.log('Engine', 'Vault backup failed');
-      }
-    });
+  handleVaultBackup() {
+    const { KeyringController } = this.context;
+    KeyringController.subscribe((state) =>
+      backupVault(state).then((result) => {
+        if (result.success) {
+          console.log('Engine', 'Vault was backed up', result.vault);
+        } else {
+          console.log('Engine', 'Vault backup failed');
+        }
+      }),
+    );
   }
 
   startPolling() {
