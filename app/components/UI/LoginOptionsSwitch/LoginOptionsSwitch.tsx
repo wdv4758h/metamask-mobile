@@ -11,7 +11,7 @@ import {
 import { useSelector } from 'react-redux';
 
 interface Props {
-  shouldRenderBiometricOption?: BIOMETRY_TYPE;
+  shouldRenderBiometricOption: BIOMETRY_TYPE | null;
   onUpdateBiometryChoice: (biometryEnabled: boolean) => void;
   onUpdateRememberMe: (rememberMeEnabled: boolean) => void;
 }
@@ -47,7 +47,7 @@ const LoginOptionsSwitch = ({
 
   // should only render remember me option if biometrics are disabled and rememberOptionMeEnabled is enabled in security settings
   // if both are disabled then this component returns null
-  if (shouldRenderBiometricOption !== undefined) {
+  if (shouldRenderBiometricOption !== null) {
     return (
       <View style={styles.container} testID={LOGIN_WITH_BIOMETRICS_SWITCH}>
         <Text style={styles.label}>
@@ -69,7 +69,7 @@ const LoginOptionsSwitch = ({
       </View>
     );
   } else if (
-    shouldRenderBiometricOption === undefined &&
+    shouldRenderBiometricOption === null &&
     allowLoginWithRememberMe === true
   ) {
     return (

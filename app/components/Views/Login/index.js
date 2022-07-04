@@ -453,7 +453,7 @@ class Login extends PureComponent {
     const shouldRenderBiometricLogin =
       this.state.biometryType && !this.state.biometryPreviouslyDisabled
         ? this.state.biometryType
-        : undefined;
+        : null;
     return (
       <LoginOptionsSwitch
         shouldRenderBiometricOption={shouldRenderBiometricLogin}
