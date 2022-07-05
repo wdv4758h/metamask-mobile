@@ -42,7 +42,7 @@ import NotificationManager from './NotificationManager';
 import Logger from '../util/Logger';
 import { LAST_INCOMING_TX_BLOCK_INFO } from '../constants/storage';
 import { isZero } from '../util/lodash';
-import { backupVault } from './backupVault';
+import { backupVault, resetVaultBackup } from './backupVault';
 
 const NON_EMPTY = 'NON_EMPTY';
 
