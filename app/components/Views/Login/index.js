@@ -21,7 +21,12 @@ import { strings } from '../../../../locales/i18n';
 import SecureKeychain from '../../../core/SecureKeychain';
 import FadeOutOverlay from '../../UI/FadeOutOverlay';
 import setOnboardingWizardStep from '../../../actions/wizard';
-import { logIn, logOut, checkedAuth } from '../../../actions/user';
+import {
+  logIn,
+  logOut,
+  checkedAuth,
+  setIsUsingRememberMe,
+} from '../../../actions/user';
 import { connect } from 'react-redux';
 import Device from '../../../util/device';
 import { OutlinedTextField } from 'react-native-material-textfield';
@@ -221,6 +226,11 @@ class Login extends PureComponent {
      * TEMPORARY state for animation control on Nav/App/index.js
      */
     checkedAuth: PropTypes.func,
+
+    /**
+     * Action to set if the user is using remember me for authentication
+     */
+    setIsUsingRememberMe: PropTypes.func,
   };
 
   state = {
@@ -300,6 +310,7 @@ class Login extends PureComponent {
     const credentials = await SecureKeychain.getGenericPassword();
     if (credentials) {
       this.setState({ rememberMe: true });
+      this.props.setIsUsingRememberMe(true);
       // Restore vault with existing credentials
       const { KeyringController } = Engine.context;
       try {
@@ -325,6 +336,7 @@ class Login extends PureComponent {
         this.props.navigation.replace('HomeNav');
       } catch (error) {
         this.setState({ rememberMe: false });
+        this.props.setIsUsingRememberMe(false);
         Logger.error(error, 'Failed to login using Remember Me');
       }
     }
@@ -449,6 +461,7 @@ class Login extends PureComponent {
   renderSwitch = () => {
     const handleUpdateRememberMe = (rememberMe) => {
       this.setState({ rememberMe });
+      this.props.setIsUsingRememberMe(rememberMe);
     };
     const shouldRenderBiometricLogin =
       this.state.biometryType && !this.state.biometryPreviouslyDisabled
@@ -602,6 +615,8 @@ const mapDispatchToProps = (dispatch) => ({
   logIn: () => dispatch(logIn()),
   logOut: () => dispatch(logOut()),
   checkedAuth: () => dispatch(checkedAuth('login')),
+  setIsUsingRememberMe: (isUsingRememberMe) =>
+    dispatch(setIsUsingRememberMe(isUsingRememberMe)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Login);
